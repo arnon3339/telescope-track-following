@@ -12,6 +12,9 @@ def run_rec_with_noisecut():
     except:
         pass
     for_track_data = pd.read_csv("./newdata/datasubselchit_70MeV1000MU.csv", index_col=None)
+    for_track_data["posX"] = for_track_data["cposX"]*30.0/1024
+    for_track_data["posY"] = for_track_data["cposY"]*13.8/512
+    for_track_data["posZ"] = for_track_data["layerID"]*25.0 + 50
     if noisecut < 0:
         for_track_data = pd.concat([
             for_track_data[(for_track_data.layerID != 4) & (for_track_data.clusterSize >= 2)],
@@ -24,8 +27,8 @@ def run_rec_with_noisecut():
     evts = np.unique(for_track_data["eventID"].values)
     rec_track_list = [] 
     evts.sort()
-    smaxs = np.arange(1, 400, 2)
-    mcss = np.arange(1, 100)
+    smaxs = np.linspace(0, 15, 100)
+    mcss = np.arange(0, 3.14*80/2 + 1, 100)
     for smax in smaxs:
         for mcs in mcss:
             print(f"Starting Smax: {smax}, MCS: {mcs}")
