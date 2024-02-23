@@ -180,12 +180,16 @@ def cal_dvector(points):
     return dvec
 
 def cal_dtheta(dvector, points):
-    d = np.sqrt(sum([(points["x"][1] - points["x"][0])**2 + (points["y"][1] - points["y"][0])**2 + (points["z"][1] - points["z"][0])**2]))
+    # d = np.sqrt(sum([(points["x"][1] - points["x"][0])**2 + (points["y"][1] - points["y"][0])**2 + (points["z"][1] - points["z"][0])**2]))
     m0m1 = np.array([points["x"][1] - points["x"][0], points["y"][1] - points["y"][0], points["z"][1] - points["z"][0]])
     cos_value = m0m1.dot(dvector)/\
         (np.sqrt(sum([np.power(elem, 2) for elem in m0m1])) * np.sqrt(sum([np.power(elem, 2) for elem in dvector])))
     # r = np.sqrt(cross.dot(cross))/np.sqrt(dvector.dot(dvector))
-    return np.arccos(cos_value)
+    if cos_value > 1:
+        cos_value = 1
+    elif cos_value < -1:
+        cos_value = -1
+    return np.fabs(np.arccos(cos_value))
 
 def cal_S_n(S_n, theta):
     return np.sqrt(S_n**2 + theta**2)
@@ -339,17 +343,21 @@ def run_rec(data, msc_angle, S_max):
 
 def collect_track_data(all_track):
     for i in range(len(all_track)):
-        for j in all_track[i]:
-            j.data["MyTrackID"] = int(i)
-    s_data = pd.DataFrame() 
+        for j in range(len(all_track[i])):
+            all_track[i][j].data["MyTrackID"] = int(i)
+    s_data = []
     for i in range(len(all_track)):
-        for j in all_track[i]:
-            s_data = s_data.append(j.data, ignore_index=True)
+        for j in range(len(all_track[i])):
+            s_data.append(all_track[i][j].data)
     # s_data.reset_index(drop=True, inplace=True)
-    s_data = s_data.loc[:, ~s_data.columns.str.contains('^Unnamed')]
-    if 'dvector' in s_data.columns:
-        del s_data["dvector"]
-    return s_data
+    # s_data = s_data.loc[:, ~s_data.columns.str.contains('^Unnamed')]
+    if s_data:
+        s_data = pd.DataFrame(s_data)
+        if 'dvector' in s_data.columns:
+            del s_data["dvector"]
+        return s_data
+    else:
+        return pd.DataFrame({}) 
 
 def plot_all_track(all_track, line=0):
     fig = plt.figure(figsize=(20, 15))

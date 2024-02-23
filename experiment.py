@@ -1,4 +1,4 @@
-#!/home/arnon/Virenv/physics/bin/python3
+#!/home2/arnon3339/Projects/telescope-track-following/.python/bin/python3
 from ast import literal_eval
 import numpy as np
 import pandas as pd
