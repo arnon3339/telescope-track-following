@@ -1,0 +1,87 @@
+#/vis/open OGL
+# Ref material database
+/gate/geometry/setMaterialDatabase GateMaterials.db
+
+# Setup world geometry
+/gate/world/geometry/setXLength 150.0 mm
+/gate/world/geometry/setYLength 150.0 mm
+/gate/world/geometry/setZLength 700.0 mm
+/gate/world/placement/setTranslation 0 0 0 mm
+/gate/world/vis/setVisible false
+
+# Setup tracker geometry
+/gate/world/daughters/name scanner
+/gate/world/daughters/systemType scanner
+/gate/world/daughters/insert box
+/gate/scanner/geometry/setXLength 100.0 mm
+/gate/scanner/geometry/setYLength 100.0 mm
+/gate/scanner/geometry/setZLength 600.0 mm
+/gate/scanner/placement/setTranslation 0 0 0 mm
+/gate/scanner/vis/setVisible false
+
+/gate/scanner/daughters/name AirSensor
+/gate/scanner/daughters/insert box
+/gate/AirSensor/geometry/setXLength 100.0 mm
+/gate/AirSensor/geometry/setYLength 100.0 mm
+/gate/AirSensor/geometry/setZLength 1 um
+/gate/AirSensor/placement/setTranslation 0 0 -200.0 mm
+/gate/AirSensor/setMaterial Air
+/gate/scanner/vis/setVisible false
+
+/gate/AirSensor/repeaters/insert linear
+/gate/AirSensor/linear/autoCenter false
+/gate/AirSensor/linear/setRepeatNumber 5
+/gate/AirSensor/linear/setRepeatVector 0 0 100.0 mm
+
+# Attach sensitive detector
+## 2. Calorimeter
+/gate/systems/scanner/level1/attach AirSensor
+
+/gate/AirSensor/attachCrystalSD
+
+
+# Setup physics process
+## 1. Setup main physics
+/gate/geometry/setIonisationPotential Water 78 eV
+/gate/physics/addPhysicsList QGSP_BIC_EMY
+#/gate/physics/SetMaxStepSizeInRegion world 0.5 mm
+#/gate/physics/ActivateStepLimiter proton
+
+## 2. Setup cut in region
+/gate/physics/Gamma/SetCutInRegion AirSensor 0.5 um
+/gate/physics/Proton/SetCutInRegion AirSensor 0.5 um
+/gate/physics/Electron/SetCutInRegion AirSensor 0.5 um
+/gate/physics/Positron/SetCutInRegion AirSensor 0.5 um
+
+/gate/run/initialize
+
+# Setup proton beam
+/gate/source/addSource PBS PencilBeam
+/gate/source/PBS/setParticleType proton
+#/gate/source/PBS/setParticleType GenericIon
+#/gate/source/PBS/setIonProperties 2 4 2 0
+#/gate/source/PBS/setIonProperties 6 12 6 0
+/gate/source/PBS/setEnergy 70 MeV
+/gate/source/PBS/setSigmaEnergy 0. MeV
+/gate/source/PBS/setPosition 0. 0. -421 mm
+/gate/source/PBS/setSigmaX 4.2 mm
+/gate/source/PBS/setSigmaY 4.2 mm
+/gate/source/PBS/setSigmaTheta 3.0 mrad
+/gate/source/PBS/setSigmaPhi 3.0 mrad
+/gate/source/PBS/setEllipseXThetaEmittance 12.0 mm*mrad
+/gate/source/PBS/setEllipseXThetaRotationNorm negative
+/gate/source/PBS/setEllipseYPhiEmittance 12.0 mm*mrad
+/gate/source/PBS/setEllipseYPhiRotationNorm negative
+
+/gate/output/root/enable
+/gate/output/root/setRootSinglesFlag 0
+/gate/output/root/setFileName data/simulation/beam_spot
+
+#===============#
+# START BEAMS	#
+#===============#
+
+/gate/random/setEngineName MersenneTwister
+/gate/random/setEngineSeed auto
+/gate/application/setTotalNumberOfPrimaries 100000
+/gate/application/start

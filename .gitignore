@@ -1,0 +1,17 @@
+**__pycache__/
+
+.python/
+
+data/
+
+output/
+
+model3d/
+
+logs/
+
+imgs/
+
+.ipynb_checkpoints/
+
+refs/

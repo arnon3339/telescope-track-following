@@ -1,0 +1,110 @@
+/gate/geometry/setMaterialDatabase GateMaterials.db
+
+# Setup world geometry
+/gate/world/geometry/setXLength 300.0 mm
+/gate/world/geometry/setYLength 180.0 mm
+/gate/world/geometry/setZLength 2000.0 mm
+/gate/world/placement/setTranslation 0 0 0 mm
+/gate/world/vis/setVisible false
+
+# Setup degrader geometry
+/gate/world/daughters/name degrader
+/gate/world/daughters/insert cylinder
+/gate/degrader/geometry/setRmin 1.0 mm
+/gate/degrader/geometry/setRmax 50.0 mm
+/gate/degrader/geometry/setHeight 800.0 mm
+/gate/degrader/geometry/setPhiStart 0 deg
+/gate/degrader/geometry/setDeltaPhi 360 deg
+/gate/degrader/placement/setTranslation 0 0 181 mm
+/gate/degrader/setMaterial Acrylic
+/gate/degrader/vis/forceSolid
+/gate/degrader/vis/setColor gray
+
+# Setup tracker geometry
+/gate/world/daughters/name scanner
+/gate/world/daughters/systemType scanner
+/gate/world/daughters/insert box
+/gate/scanner/geometry/setXLength 30.0 mm
+/gate/scanner/geometry/setYLength 13.8 mm
+/gate/scanner/geometry/setZLength 50.0 mm
+/gate/scanner/placement/setTranslation 0 0 500 mm
+/gate/scanner/vis/setVisible false
+
+#/gate/world/daughters/name scanner
+#/gate/world/daughters/systemType scanner
+#/gate/world/daughters/insert box
+#/gate/scanner/geometry/setYLength 13.8 mm
+#/gate/scanner/geometry/setZLength 50.0 um
+#/gate/scanner/placement/setTranslation 0 0 500 mm
+#/gate/scanner/vis/setVisible false
+
+/gate/scanner/daughters/name VSensor
+/gate/scanner/daughters/insert box
+/gate/VSensor/geometry/setXLength 30.0 mm
+/gate/VSensor/geometry/setYLength 13.8 mm
+/gate/VSensor/geometry/setZLength 0.001 um
+/gate/VSensor/placement/setTranslation 0 0 0 mm
+/gate/VSensor/setMaterial Vacuum
+/gate/VSensor/vis/forceSolid
+/gate/VSensor/vis/setColor green
+
+# Attach sensitive detector
+## 2. Calorimeter
+/gate/systems/scanner/level1/attach scanner
+/gate/VSensor/attachCrystalSD
+
+
+# Setup physics process
+## 1. Setup main physics
+/gate/geometry/setIonisationPotential Water 78 eV
+/gate/physics/addPhysicsList QGSP_BIC_EMY
+#/gate/physics/SetMaxStepSizeInRegion world 0.5 mm
+#/gate/physics/ActivateStepLimiter proton
+
+## 2. Setup cut in region
+/gate/physics/Gamma/SetCutInRegion degrader 1 mm
+/gate/physics/Proton/SetCutInRegion degrader 1 mm
+/gate/physics/Electron/SetCutInRegion degrader 1 mm
+/gate/physics/Positron/SetCutInRegion degrader 1 mm
+/gate/physics/Gamma/SetCutInRegion VSensor 10 um
+/gate/physics/Proton/SetCutInRegion VSensor 10 um
+/gate/physics/Electron/SetCutInRegion VSensor 10 um
+/gate/physics/Positron/SetCutInRegion VSensor 10 um
+
+/gate/run/initialize
+
+# Setup proton beam
+/gate/source/addSource PBS PencilBeam
+/gate/source/PBS/setParticleType proton
+#/gate/source/PBS/setParticleType GenericIon
+#/gate/source/PBS/setIonProperties 2 4 2 0
+#/gate/source/PBS/setIonProperties 6 12 6 0
+/gate/source/PBS/setEnergy 220 MeV
+/gate/source/PBS/setSigmaEnergy 0. MeV
+/gate/source/PBS/setPosition 0. 0. -20 mm
+/gate/source/PBS/setSigmaX 4.2 mm
+/gate/source/PBS/setSigmaY 4.2 mm
+/gate/source/PBS/setSigmaTheta 1.0 mrad
+/gate/source/PBS/setSigmaPhi 1.0 mrad
+/gate/source/PBS/setEllipseXThetaEmittance 0.5 mm*mrad
+/gate/source/PBS/setEllipseXThetaRotationNorm negative
+/gate/source/PBS/setEllipseYPhiEmittance 0.5 mm*mrad
+/gate/source/PBS/setEllipseYPhiRotationNorm negative
+
+/gate/output/root/enable
+/gate/output/root/setRootSinglesFlag 0
+/gate/output/root/setFileName ../data/simulation/pwax
+
+#===============#
+# VISUALIZATION	#
+#===============#
+#/gate/control/execute visu.mac
+
+#===============#
+# START BEAMS	#
+#===============#
+
+/gate/random/setEngineName MersenneTwister
+/gate/random/setEngineSeed auto
+/gate/application/setTotalNumberOfPrimaries 10000
+/gate/application/start

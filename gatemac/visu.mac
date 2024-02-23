@@ -1,0 +1,30 @@
+# V I S U A L I S A T I O N
+/vis/open OGL
+/vis/viewer/reset
+/vis/viewer/zoom 1
+/vis/viewer/set/style surface
+/vis/drawVolume 
+/tracking/storeTrajectory 1
+/vis/scene/endOfEventAction accumulate
+/vis/viewer/update
+/vis/verbose 2
+/gate/world/daughters/name                Volume_Name
+/gate/world/daughters/insert              box
+/gate/Volume_Name/geometry/setXLength     40 cm
+/gate/Volume_Name/geometry/setYLength     40 cm
+/gate/Volume_Name/geometry/setZLength     40 cm
+/gate/Volume_Name/vis/forceWireframe
+/gate/Volume_Name/daughters/name          trapeze_name
+/gate/Volume_Name/daughters/insert        trpd
+/gate/trapeze_name/geometry/setX1Length   23.3 mm
+/gate/trapeze_name/geometry/setY1Length   21.4 mm
+/gate/trapeze_name/geometry/setX2Length   23.3 mm
+/gate/trapeze_name/geometry/setY2Length   23.3 mm
+/gate/trapeze_name/geometry/setZLength    6. mm
+/gate/trapeze_name/geometry/setXBoxPos    0. mm
+/gate/trapeze_name/geometry/setYBoxPos    0. m
+/gate/trapeze_name/geometry/setZBoxPos    0.7501 mm
+/gate/trapeze_name/geometry/setXBoxLength 20.3 mm
+/gate/trapeze_name/geometry/setYBoxLength 20.3 mm
+/gate/trapeze_name/geometry/setZBoxLength 4.501 mm
+/gate/trapeze_name/vis/setColor red

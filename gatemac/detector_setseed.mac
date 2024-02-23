@@ -1,0 +1,193 @@
+#/vis/open OGL
+# Ref material database
+/gate/random/setEngineSeed {seed}
+#/gate/random/setEngineSeed 0
+/gate/geometry/setMaterialDatabase /home/arnon/Projects/telescope-track-following/gatemac/GateMaterials.db
+
+# Setup world geometry
+/gate/world/geometry/setXLength 300.0 mm
+/gate/world/geometry/setYLength 180.0 mm
+/gate/world/geometry/setZLength 740.0 mm
+/gate/world/placement/setTranslation 0 0 0 mm
+/gate/world/vis/setVisible false
+
+# Setup phantom geometry
+#/gate/world/daughters/name phantom
+#/gate/world/daughters/systemType scanner
+#/gate/world/daughters/insert box
+#/gate/phantom/geometry/setXLength 100.0 mm
+#/gate/phantom/geometry/setYLength 100.0 mm
+#/gate/phantom/geometry/setZLength 360.0 mm
+#/gate/phantom/placement/setTranslation 0 0 -160 mm
+#/gate/phantom/vis/setVisible false
+
+# Setup degrader geometry
+#/gate/phantom/daughters/name degrader
+#/gate/phantom/daughters/insert box
+#/gate/degrader/geometry/setXLength 40.0 mm
+#/gate/degrader/geometry/setYLength 40.0 mm
+#/gate/degrader/geometry/setZLength 39.0 mm
+#/gate/degrader/geometry/setZLength 40.0 mm
+#/gate/degrader/geometry/setZLength 41.0 mm
+#/gate/degrader/geometry/setZLength 42.0 mm
+#/gate/degrader/placement/setTranslation 0 0 0 mm
+#/gate/degrader/setMaterial SWP
+#/gate/degrader/vis/setVisible false
+#/gate/degrader/vis/forceSolid
+#/gate/degrader/vis/setColor blue
+
+# Setup Cu collimator geometry
+#/gate/phantom/daughters/name collimator
+#/gate/phantom/daughters/insert cylinder
+#/gate/collimator/geometry/setRmin 1.0 mm
+#/gate/collimator/geometry/setRmax 50.0 mm
+#/gate/collimator/geometry/setHeight 60.0 mm
+#/gate/collimator/geometry/setPhiStart 0 deg
+#/gate/collimator/geometry/setDeltaPhi 360 deg
+#/gate/collimator/placement/setTranslation 0 0 0 mm
+#/gate/collimator/placement/setRotationAxis 1 0 0
+#/gate/collimator/placement/setRotationAngle 90 deg
+#/gate/collimator/setMaterial Copper
+
+# Setup Acrylic collimator geometry
+#/gate/phantom/daughters/name collimator
+#/gate/phantom/daughters/insert cylinder
+#/gate/collimator/geometry/setRmin 1.0 mm
+#/gate/collimator/geometry/setRmax 50.0 mm
+#/gate/collimator/geometry/setHeight 360.0 mm
+#/gate/collimator/geometry/setPhiStart 0 deg
+#/gate/collimator/geometry/setDeltaPhi 360 deg
+#/gate/collimator/placement/setTranslation 0 0 0 mm
+#/gate/collimator/setMaterial Acrylic
+
+# Setup tracker geometry
+/gate/world/daughters/name scanner
+/gate/world/daughters/systemType scanner
+/gate/world/daughters/insert box
+/gate/scanner/geometry/setXLength 30.0 mm
+/gate/scanner/geometry/setYLength 13.8 mm
+/gate/scanner/geometry/setZLength 150.0 mm
+/gate/scanner/placement/setTranslation 0 0 115.0 mm
+/gate/scanner/vis/setVisible false
+
+
+/gate/scanner/daughters/name Sensor_Layer
+/gate/scanner/daughters/insert box
+/gate/Sensor_Layer/geometry/setXLength 30.0 mm
+/gate/Sensor_Layer/geometry/setYLength 13.8 mm
+/gate/Sensor_Layer/geometry/setZLength 100.0 um
+/gate/Sensor_Layer/placement/setTranslation 0 0 -65 mm
+/gate/Sensor_Layer/vis/setVisible false
+
+/gate/Sensor_Layer/daughters/name ALPIDEFront
+/gate/Sensor_Layer/daughters/insert box
+/gate/ALPIDEFront/geometry/setXLength 30.0 mm
+/gate/ALPIDEFront/geometry/setYLength 13.8 mm
+/gate/ALPIDEFront/geometry/setZLength 11 um
+/gate/ALPIDEFront/placement/setTranslation 0 0 -44.5 um
+/gate/ALPIDEFront/vis/setVisible false
+#/gate/ALPIDEFront/setMaterial Aluminium
+#/gate/ALPIDEFront/vis/setColor green
+
+/gate/Sensor_Layer/daughters/name ALPIDEEpi
+/gate/Sensor_Layer/daughters/insert box
+/gate/ALPIDEEpi/geometry/setXLength 30.0 mm
+/gate/ALPIDEEpi/geometry/setYLength 13.8 mm
+/gate/ALPIDEEpi/geometry/setZLength 25 um
+/gate/ALPIDEEpi/placement/setTranslation 0 0 -26.5 um
+/gate/ALPIDEEpi/setMaterial Silicon
+/gate/ALPIDEEpi/vis/setVisible false
+#/gate/ALPIDEEpi/vis/forceSolid
+#/gate/ALPIDEEpi/vis/setColor green
+
+/gate/Sensor_Layer/daughters/name ALPIDESub
+/gate/Sensor_Layer/daughters/insert box
+/gate/ALPIDESub/geometry/setXLength 30.0 mm
+/gate/ALPIDESub/geometry/setYLength 13.8 mm
+/gate/ALPIDESub/geometry/setZLength 64 um
+/gate/ALPIDESub/placement/setTranslation 0 0 18 um
+/gate/ALPIDESub/setMaterial Silicon
+/gate/ALPIDESub/vis/setVisible false
+#/gate/ALPIDESub/vis/setColor green
+
+/gate/Sensor_Layer/repeaters/insert linear
+/gate/Sensor_Layer/linear/autoCenter false
+/gate/Sensor_Layer/linear/setRepeatNumber 6
+/gate/Sensor_Layer/linear/setRepeatVector 0 0 25.0 mm
+
+#/vis/drawVolume
+#/vis/viewer/flush
+#/vis/scene/add/trajectories
+#/vis/scene/endOfEventAction accumulate
+#/vis/viewer/update
+#/vis/viewer/refresh 
+
+# Attach sensitive detector
+## 2. Calorimeter
+/gate/systems/scanner/level1/attach Sensor_Layer
+/gate/ALPIDEEpi/attachCrystalSD
+
+
+# Setup physics process
+## 1. Setup main physics
+/gate/geometry/setIonisationPotential Water 78 eV
+/gate/physics/addPhysicsList QGSP_BIC_EMY
+#/gate/physics/SetMaxStepSizeInRegion world 0.5 mm
+#/gate/physics/ActivateStepLimiter proton
+
+## 2. Setup cut in region
+/gate/physics/Gamma/SetCutInRegion ALPIDESub 30 um
+/gate/physics/Gamma/SetCutInRegion ALPIDEEpi 10 um
+/gate/physics/Gamma/SetCutInRegion ALPIDEFront 5 um
+/gate/physics/Proton/SetCutInRegion ALPIDESub 30 um
+/gate/physics/Proton/SetCutInRegion ALPIDEEpi 1 um
+/gate/physics/Proton/SetCutInRegion ALPIDEFront 5 um
+/gate/physics/Electron/SetCutInRegion ALPIDESub 30 um
+/gate/physics/Electron/SetCutInRegion ALPIDEEpi 1 um
+/gate/physics/Electron/SetCutInRegion ALPIDEFront 5 um
+/gate/physics/Positron/SetCutInRegion ALPIDESub 30 um
+/gate/physics/Positron/SetCutInRegion ALPIDEEpi 1 um
+/gate/physics/Positron/SetCutInRegion ALPIDEFront 5 um
+
+#/gate/physics/SetMaxStepSizeInRegion ALPIDEEpi 1 um
+#/gate/physics/ActivateStepLimiter proton
+#/gate/physics/ActivateStepLimiter gamma
+#/gate/physics/ActivateStepLimiter electron
+#/gate/physics/ActivateStepLimiter positron
+
+/gate/run/initialize
+
+# Setup proton beam
+/gate/source/addSource PBS PencilBeam
+/gate/source/PBS/setParticleType proton
+#/gate/source/PBS/setParticleType GenericIon
+#/gate/source/PBS/setIonProperties 2 4 2 0
+#/gate/source/PBS/setIonProperties 6 12 6 0
+/gate/source/PBS/setEnergy 70 MeV
+/gate/source/PBS/setSigmaEnergy 0.001 MeV
+/gate/source/PBS/setPosition 0. 0. -421 mm
+/gate/source/PBS/setSigmaX 4.2 mm
+/gate/source/PBS/setSigmaY 4.2 mm
+#/gate/source/PBS/setSigmaX 3.2 mm #for 200 MeV
+#/gate/source/PBS/setSigmaY 3.2 mm #for 200 MeV
+/gate/source/PBS/setSigmaTheta 3.0 mrad
+/gate/source/PBS/setSigmaPhi 3.0 mrad
+#/gate/source/PBS/setSigmaTheta 0.1 mrad #for 200 MeV
+#/gate/source/PBS/setSigmaPhi 0.1 mrad #for 200 Mev
+/gate/source/PBS/setEllipseXThetaEmittance 0.5 mm*mrad
+/gate/source/PBS/setEllipseXThetaRotationNorm negative
+/gate/source/PBS/setEllipseYPhiEmittance 0.5 mm*mrad
+/gate/source/PBS/setEllipseYPhiRotationNorm negative
+
+/gate/output/root/enable
+/gate/output/root/setRootSinglesFlag 0
+/gate/output/root/setFileName /home/arnon/Projects/telescope-track-following/data/simulation/rootgate/e70MeVnorm/10000telescope_70MeV_noabs_{seed}
+
+#===============#
+# START BEAMS	#
+#===============#
+
+/gate/random/setEngineName MersenneTwister
+/gate/random/setEngineSeed auto
+/gate/application/setTotalNumberOfPrimaries 10000
+/gate/application/start
