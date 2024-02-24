@@ -28,7 +28,7 @@ def run_rec_with_noisecut():
     rec_track_list = [] 
     evts.sort()
     smaxs = np.linspace(0, 15, 100)
-    mcss = np.arange(0, 3.14*80/2 + 1, 100)
+    mcss = np.linspace(0, 3.14*80/180, 100)
     for smax in smaxs:
         for mcs in mcss:
             print(f"Starting Smax: {smax}, MCS: {mcs}")
@@ -44,8 +44,11 @@ def run_rec_with_noisecut():
                 # print(collected_track_data)
                 rec_track_list.append(collected_track_data)
             print(f"Finished Smax: {smax}, MCS: {mcs}\n")
-    pd.concat(rec_track_list, ignore_index=True).\
-        to_csv(f"./newdata/reconstruction/sub/e70MeV_{'normal' if noisecut==-1 else noisecut}.csv",
+    track_result_data = pd.concat(rec_track_list, ignore_index=True)
+    del track_result_data["Unnamed: 0"]
+    track_result_data["mcs"] = track_result_data["mcs"].apply(lambda x: '{:.4f}'.format(x))
+    track_result_data["smax"] = track_result_data["smax"].apply(lambda x: '{:.4f}'.format(x))
+    track_result_data.to_csv(f"./newdata/reconstruction/sub/e70MeV_{'normal' if noisecut==-1 else noisecut}.csv",
                index=False)
 
 if __name__ == "__main__":
