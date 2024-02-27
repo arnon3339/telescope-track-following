@@ -1,9 +1,9 @@
-Datetime: Tue Feb 27 12:00:15 2024[?1049h[22;0;0t[1;24r(B[m[4l[?7h[H[2JEvery 2.0s: sensors[1;44Hpctsoftware: Tue Feb 27 12:00:15 2024[3;1Hcoretemp-isa-0000
+Datetime: Tue Feb 27 12:01:18 2024(B)0[?1049h[1;24r[m[4l[H[JEvery 2.0s: sensors[1;44Hpctsoftware: Tue Feb 27 12:01:18 2024[3;1Hcoretemp-isa-0000
 [4dAdapter: ISA adapter
-[5dPackage id 0:  +33.0°C  (high = +86.0°C, crit = +100.0°C)
+[5dPackage id 0:  +35.0°C  (high = +86.0°C, crit = +100.0°C)
 [6dCore 0:[6;16H+33.0°C  (high = +86.0°C, crit = +100.0°C)
 [7dCore 1:[7;16H+33.0°C  (high = +86.0°C, crit = +100.0°C)
-[8dCore 2:[8;16H+33.0°C  (high = +86.0°C, crit = +100.0°C)
+[8dCore 2:[8;16H+34.0°C  (high = +86.0°C, crit = +100.0°C)
 [9dCore 3:[9;16H+32.0°C  (high = +86.0°C, crit = +100.0°C)
 [10dCore 4:[10;16H+32.0°C  (high = +86.0°C, crit = +100.0°C)
 [11dCore 5:[11;16H+31.0°C  (high = +86.0°C, crit = +100.0°C)
@@ -17,7 +17,7 @@ Datetime: Tue Feb 27 12:00:15 2024[?1049h[22;0;0t[1;24r(B[m[4l[?7h[H[2J
 
 #######################################################
 
-Datetime: Tue Feb 27 12:00:20 2024[?1049h[22;0;0t[1;24r(B[m[4l[?7h[H[2JEvery 2.0s: sensors[1;44Hpctsoftware: Tue Feb 27 12:00:20 2024[3;1Hcoretemp-isa-0000
+Datetime: Tue Feb 27 12:01:23 2024(B)0[?1049h[1;24r[m[4l[H[JEvery 2.0s: sensors[1;44Hpctsoftware: Tue Feb 27 12:01:23 2024[3;1Hcoretemp-isa-0000
 [4dAdapter: ISA adapter
 [5dPackage id 0:  +34.0°C  (high = +86.0°C, crit = +100.0°C)
 [6dCore 0:[6;16H+32.0°C  (high = +86.0°C, crit = +100.0°C)

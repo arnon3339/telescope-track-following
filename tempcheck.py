@@ -29,7 +29,7 @@ if __name__ == "__main__":
                     process.terminate()
                     break
             print("i: {}".format(i))
-            time.sleep(5)
+            time.sleep(60)
                 
             # if delta_time > 10:
             #     print("time:-> {}".format((final_time - current_time).total_seconds()))
