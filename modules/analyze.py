@@ -13,7 +13,7 @@ with open("./config.json", 'r') as f:
 
 ALPIDE_coms = list(combinations([0, 1, 2, 3, 4, 5], 2))
 
-def Gauss(x, A, x0, sigma):
+def Gauss(x, x0, sigma, A):
     return A*np.exp(-(x-x0)**2/(2*sigma**2))
 
 def Gauss_fit(x, A, B):
@@ -29,12 +29,11 @@ def Gauss_2fits(x, mu1, sigma1, A1, mu2, sigma2, A2):
 def func_sigd(x, a, b, c):
     return a*np.log(b*x) + c
 
-def get_est_hit_data(data, mean):
+def get_est_hit_data(data, mean, lim):
     data.sort()
-    print(data)
     values, counts = np.unique(data, return_counts=True)
     pd_data = pd.DataFrame({"values": values, "counts": counts})
-    sel_pd_data = pd_data[(pd_data.values < 380) & (pd_data.values > 130)]
+    sel_pd_data = pd_data[(pd_data.values < lim[1]) & (pd_data.values > lim[0])]
     plt.plot(sel_pd_data["values"], sel_pd_data["counts"])
     parameters, covariance = curve_fit(Gauss, 
                                        sel_pd_data["values"].values, 
@@ -42,7 +41,7 @@ def get_est_hit_data(data, mean):
                                        p0=[sel_pd_data["counts"].max(), mean, 15]
                                        )
     print(parameters)
-    plt.show()
+    # plt.show()
     
 
 def get_hit_data(data):
@@ -148,6 +147,16 @@ def get_gfith(data, lim):
         data_dict["muY"].append(muy)
         data_dict["sigmaY"].append(sigmay)
     return data_dict
+
+def get_gfit2g(data, expected):
+    values, counts = np.unique(data, return_counts=True)
+    params, covs = curve_fit(Gauss_2fits, values, counts, expected)
+    return params
+
+def get_gfitg(data, expected):
+    values, counts = np.unique(data, return_counts=True)
+    params, covs = curve_fit(Gauss, values, counts, expected)
+    return params
 
 def fit_sub(data, lims, expected):
     data_dict = {"layerID": [], "sigmaX": [], "sigmaY":[], 

@@ -1031,7 +1031,7 @@ def plotbox_edep_and_cluster(data, kind="Cluster size", name="", title=""):
     plt.savefig(f"./output/imgs/cluster/{kind.replace(' ', '_').lower()}_{name}.png", dpi=300, bbox_inches='tight')
     # plt.show()
 
-def plotavg_edep_and_cluster(data, data_sim, kind="cluster size", name="", title=""): 
+def plot_avg_edep_and_cluster(data, data_sim, kind="cluster size", name="", title=""): 
     data_plot = []
     for e in np.unique(data["energy"].values):
         data_list = []
@@ -1079,7 +1079,7 @@ def plotavg_edep_and_cluster(data, data_sim, kind="cluster size", name="", title
     leg = ax.legend(prop={'fname': FNAME, 'size': FONT_SIZE})
     leg.get_frame().set_edgecolor('black')
     leg.get_frame().set_boxstyle('Square', pad=0.3)
-    plt.savefig(f"./output/imgs/cluster/mean_{kind.replace(' ', '_').lower()}_{name}.png", dpi=300, bbox_inches='tight')
+    # plt.savefig(f"./output/imgs/cluster/mean_{kind.replace(' ', '_').lower()}_{name}.png", dpi=300, bbox_inches='tight')
     plt.show()
 
 def plot_cluster_count(data, title="", name=""):

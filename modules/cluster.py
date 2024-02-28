@@ -14,14 +14,17 @@ def exproot2array(file_path, lim={}):
     X = np.array([range(0, 1024) for i in range(512)])
     Y = np.array([[i]*1024 for i in range(512)])
     data = []
-    root_data =uproot.open(file_path)
-    hit_keys = [f"Hitmaps/ALPIDE_{i}/h_hitmap_ALPIDE_{i};1" for i in range(6)]
-    for key in hit_keys:
-        if key in root_data.keys():
-            data.append(root_data[key].to_numpy()[0].transpose())
-    if lim and data:
-        data[0][((X - lim["x"])**2)/lim["a"]**2 + ((Y - lim["y"])**2)/lim["b"]**2 > 1] = 0
-    return data
+    try:
+        root_data =uproot.open(file_path)
+        hit_keys = [f"Hitmaps/ALPIDE_{i}/h_hitmap_ALPIDE_{i};1" for i in range(6)]
+        for key in hit_keys:
+            if key in root_data.keys():
+                data.append(root_data[key].to_numpy()[0].transpose())
+        if lim and data:
+            data[0][((X - lim["x"])**2)/lim["a"]**2 + ((Y - lim["y"])**2)/lim["b"]**2 > 1] = 0
+        return data
+    except:
+        return []
 
 def find_cluster(data=[]):
     clusters = []

@@ -598,11 +598,12 @@ if __name__ == "__main__":
     #     }
     # def sub_offset(pos, layer_id, ke, dim):
     #     if dim == 'x':
-    #         return pos - (cfg["experiment"][f"{ke} MeV"]["mus"][dim][int(layer_id)] - 512)
+    #         return pos - (cfg["experiment"]["70 MeV"]["mus"][dim][int(layer_id)] - 512)
     #     else:
-    #         return pos - (cfg["experiment"][f"{ke} MeV"]["mus"][dim][int(layer_id)] - 256)
+    #         return pos - (cfg["experiment"]["70 MeV"]["mus"][dim][int(layer_id)] - 256)
     # col_hit_data_sub = col_hit_data.copy()
     # for ke in [70, 100, 120, 150, 180, 200]:
+    # # for ke in [70]:
     #     col_hit_data_sub[ke].insert(len(col_hit_data[ke].columns), "posSubX", 
     #                             col_hit_data[ke]["posX"].values)
     #     col_hit_data_sub[ke]["posSubX"] = col_hit_data_sub[ke]\
@@ -630,26 +631,82 @@ if __name__ == "__main__":
 
     #------------- Analyze ------------------#
     # hit_data = pd.read_csv("./data/experiment/data-col/data_70MeV2000MU.csv", index_col=None)
+    # hit_data = pd.read_csv("./newdata/datasubselchit_70MeV1000MU.csv", index_col=None)
     # data_hit_wo_noise_layer0 = hit_data[(hit_data.clusterSize > 1) & (hit_data.layerID == 0)]
-    # data_hit_wo_noise_layer0 = data_hit_wo_noise_layer0["posX"].values 
+    # data_hit_wo_noise_layer0 = data_hit_wo_noise_layer0["posSubX"].values 
     # data_hit_wo_noise_layer0.sort()
 
     # hit_data = hit_data.drop_duplicates(subset=["eventID", "hitID", "layerID"])
     # hit_data_wo_noise = hit_data[hit_data.clusterID > 1]
     # hit_data_wo_noise_posx_layer0 = np.sort(hit_data_wo_noise[hit_data_wo_noise.layerID == 0]["posX"].values)
-    # print(hit_data_wo_noise_posx_layer0)
     # values, counts = np.unique(data_hit_wo_noise_layer0, return_counts=True)
     # plt.plot(values, counts)
     # plt.show()
-    # hit_data_sub = pd.read_csv("./data/experiment/data-col/datasub_200MeV1000MU.csv", index_col=None)
+    # layer = 5
+    # energy = 70
+    # hit_data_sub = pd.read_csv("./data/experiment/data-col/datasub_{}MeV1000MU.csv".format(energy),
+                            #    index_col=None)
     # hit_data_sub = hit_data_sub.drop_duplicates(subset=["clusterID"])
     # print(hit_data_sub[hit_data_sub.clusterSize > 1]["posSubX"])
-    #analyze.get_hit_data(hit_data[hit_data.clusterSize > 1]["posX"].values)
-    # analyze.get_hit_data(hit_data[(hit_data.clusterSize > 1) & (hit_data.layerID == 0)]["posSubX"].values)
+    # analyze.get_hit_data(hit_data_sub[hit_data_sub.clusterSize > 1]["posX"].values)
+    # analyze.get_hit_data(hit_data_sub[(hit_data_sub.clusterSize > 1) & (hit_data_sub.layerID == 0)]["posSubX"].values)
     # analyze.get_est_hit_data(
-    #     hit_data_sub[(hit_data_sub.clusterSize > 1) & (hit_data_sub.layerID == 2)]["posSubY"].values,
-    #     256 
+    #     hit_data_sub[(hit_data_sub.clusterSize > 1) & (hit_data_sub.layerID == layer)]["posSubX"].values,
+    #     512, lim=cfg["experiment"]["{} MeV".format(energy)]["range"]["xsub"][layer]
     #     )
+    
+    #--------------- Fitting sub Guassian ----------------#
+    # layer = 5
+    axis = "y"
+    energy = 100 
+    hit_data_sub = pd.read_csv("./data/experiment/data-col/datasub_{}MeV1000MU.csv".format(energy),
+                               index_col=None)
+    fig, axs = plt.subplots(2, 3, figsize=(12, 8))
+    for layer in range(6):
+        data_layer = []
+        lim = []
+        params = []
+        if axis == "x":
+            # lim = [0, 1024]
+            lim = cfg["experiment"]["{} MeV".format(energy)]["range"]["xsub"][layer]
+            data_layer = hit_data_sub[(hit_data_sub.layerID == layer) &
+                                    (hit_data_sub.clusterSize > 1) &
+                                    (hit_data_sub.posSubX <= lim[1]) &
+                                    (hit_data_sub.posSubX >= lim[0])]["posSubX"].values \
+                                        if layer != 4 else hit_data_sub[(hit_data_sub.layerID == layer) &
+                                    (hit_data_sub.clusterSize > 2) &
+                                    (hit_data_sub.posSubX <= lim[1]) &
+                                    (hit_data_sub.posSubX >= lim[0])]["posSubX"].values
+            # params = analyze.get_gfit2g(data_layer, expected=cfg["experiment"]["{} MeV".format(energy)]["expectedsub"]["x"][layer])
+            params = analyze.get_gfitg(data_layer, expected=cfg["experiment"]["{} MeV".format(energy)]["expectedsub"]["x"][layer])
+        else:
+            # lim = [0, 512]
+            lim = cfg["experiment"]["{} MeV".format(energy)]["range"]["ysub"][layer]
+            data_layer = hit_data_sub[(hit_data_sub.layerID == layer) &
+                                    (hit_data_sub.clusterSize > 1) &
+                                    (hit_data_sub.posSubY <= lim[1]) &
+                                    (hit_data_sub.posSubY >= lim[0])]["posSubY"].values \
+                                        if layer != 4 else hit_data_sub[(hit_data_sub.layerID == layer) &
+                                    (hit_data_sub.clusterSize > 2) &
+                                    (hit_data_sub.posSubY <= lim[1]) &
+                                    (hit_data_sub.posSubY >= lim[0])]["posSubY"].values
+            # params = analyze.get_gfit2g(data_layer, expected=cfg["experiment"]["{} MeV".format(energy)]["expectedsub"]["y"][layer])
+            params = analyze.get_gfitg(data_layer, expected=cfg["experiment"]["{} MeV".format(energy)]["expectedsub"]["y"][layer])
+        data_layer.sort()
+        print(params)
+        values, counts = np.unique(data_layer, return_counts=True)
+        axs[int(layer/3), layer%3].hist(data_layer, bins=range(lim[0], lim[1]))
+        axs[int(layer/3), layer%3].plot(values, analyze.Gauss(values, *params))
+        # axs[int(layer/3), layer%3].plot(values, analyze.Gauss_2fits(values, *params))
+        axs[int(layer/3), layer%3].set_title("{}".format(layer))
+        # axs[int(layer/3), layer%3].vlines(lim, 0, max(counts), color='r', linestyles='--')
+    plt.show()
+        # print("{}".format(lim))
+        # analyze.get_est_hit_data(
+        #     data_layer,
+        #     512, lim=lim
+        #     )
+    # plt.show()
 
     #-------------- reconstrution with subtracted ----------------------#
     # sub_data = pd.read_csv("./data/experiment/data-col/datasub_70MeV1000MU.csv", 
@@ -664,31 +721,39 @@ if __name__ == "__main__":
     #     if not sub_sel_chit_data2.empty:
     #         sub_sel_chit_data.append(sub_sel_chit_data2)
     # pd.concat(sub_sel_chit_data, ignore_index=True)\
-    #     .to_csv("./data/experiment/data-col/datasubselchit_70MeV1000MU.csv", index=False)
+    #     .to_csv("./data/experiment/data-col/datasubselchit_70MeV1000MU_xxx.csv", index=False)
 
     #--------------- plot cpos ------------------#
     # mylplotlib.plot_6cpos(pd.read_csv("./data/experiment/data-col/datasubselchit_70MeV1000MU.csv",
     #                                   index_col=None), axis="y")
 
     #-------------- reconstruct sub data -------------------------#
-    for_track_data = pd.read_csv("./data/experiment/data-col/datasubselchit_70MeV1000MU.csv", index_col=None)
-    evts = np.unique(for_track_data["eventID"].values)
-    rec_track_list = [] 
-    evts.sort()
-    smaxs = np.arange(1, 200, 2)
-    mcss = np.arange(1, 100)
-    for smax in smaxs:
-        for mcs in mcss:
-            print(f"Starting Smax: {smax}, MCS: {mcs}")
-            for evt_i, evt in enumerate(evts):
-                for_track_data_evt = for_track_data[for_track_data.eventID == evt]
-                rec_data = rec.run_rec(for_track_data_evt, mcs, smax)
-                collected_track_data = rec.collect_track_data(rec_data)
-                collected_track_data.insert(0, "mcs", [mcs]*len(collected_track_data.index))
-                collected_track_data.insert(0, "smax", [smax]*len(collected_track_data.index))
-                # print(collected_track_data)
-                rec_track_list.append(collected_track_data)
-            print(f"Finished Smax: {smax}, MCS: {mcs}\n")
-    pd.concat(rec_track_list, ignore_index=True).\
-        to_csv("./data/experiment/reconstruction/sub/e70MeV", index=False)
+    # for_track_data = pd.read_csv("./data/experiment/data-col/datasubselchit_70MeV1000MU.csv", index_col=None)
+    # evts = np.unique(for_track_data["eventID"].values)
+    # rec_track_list = [] 
+    # evts.sort()
+    # smaxs = np.arange(1, 200, 2)
+    # mcss = np.arange(1, 100)
+    # for smax in smaxs:
+    #     for mcs in mcss:
+    #         print(f"Starting Smax: {smax}, MCS: {mcs}")
+    #         for evt_i, evt in enumerate(evts):
+    #             for_track_data_evt = for_track_data[for_track_data.eventID == evt]
+    #             rec_data = rec.run_rec(for_track_data_evt, mcs, smax)
+    #             collected_track_data = rec.collect_track_data(rec_data)
+    #             collected_track_data.insert(0, "mcs", [mcs]*len(collected_track_data.index))
+    #             collected_track_data.insert(0, "smax", [smax]*len(collected_track_data.index))
+    #             # print(collected_track_data)
+    #             rec_track_list.append(collected_track_data)
+    #         print(f"Finished Smax: {smax}, MCS: {mcs}\n")
+    # pd.concat(rec_track_list, ignore_index=True).\
+    #     to_csv("./data/experiment/reconstruction/sub/e70MeV", index=False)
     # mylplotlib.plot_alpide_grid_track(collected_track_data, energy=70)
+
+    #---------------------- Fitting cluster --------------------------#
+    # colsubhit_data = pd.read_csv("data/experiment/data-col/datasubselchit_70MeV1000MU.csv", index_col=None)
+    # colsubhit_data_w_layer4 = colsubhit_data[(colsubhit_data.layerID == 4) & (colsubhit_data.clusterSize > 2)] 
+    # colsubhit_data_wo_layer4 = colsubhit_data[(colsubhit_data.layerID != 4) & (colsubhit_data.clusterSize > 1)] 
+    # colsubhit_data_wo_noise = pd.concat([colsubhit_data_w_layer4, colsubhit_data_wo_layer4], ignore_index=True)
+    # colsubhit_data_wo_noise = colsubhit_data_wo_noise.sort_values(by=['eventID', 'layerID'])
+    # mylplotlib.plot_avg_edep_and_cluster(colsubhit_data, cfg['simulation'])
