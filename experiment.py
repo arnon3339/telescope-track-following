@@ -7,6 +7,7 @@ import csv
 from itertools import combinations
 from modules import (cluster, mylplotlib, roothit, utils, noise, projections as proj,
                      analyze, reconstruction as rec, bg, physics as phys)
+from modules.tasks import preprocess as pre
 import os
 import random
 import json
@@ -607,7 +608,7 @@ if __name__ == "__main__":
     #     col_hit_data_sub[ke].insert(len(col_hit_data[ke].columns), "posSubX", 
     #                             col_hit_data[ke]["posX"].values)
     #     col_hit_data_sub[ke]["posSubX"] = col_hit_data_sub[ke]\
-    #         .apply(lambda row: sub_offset(row['posSubX'], row['layerID'], ke, 'x'), axis=1)
+    #         .`apply`(lambda row: sub_offset(row['posSubX'], row['layerID'], ke, 'x'), axis=1)
 
     #     col_hit_data_sub[ke].insert(len(col_hit_data[ke].columns), "posSubY", 
     #                             col_hit_data[ke]["posY"].values)
@@ -716,7 +717,7 @@ if __name__ == "__main__":
     # pd_data["sigma2"] = pd_data["sigma2"].astype("float64")
     # pd_data["amp2"] = pd_data["amp2"].astype("float64")
     # pd_data.to_csv("./beamfit_section.csv", index=False)
-    data = pd.read_csv("./beamfit_section.csv", index_col=None)
+    # data = pd.read_csv("./beamfit_section.csv", index_col=None)
     # data_hits = [
     #     pd.read_csv("./newdata/data_{}MeV1000MU.csv".format(i), index_col=None)\
     #         for i in [70, 100, 120, 150, 180, 200]
@@ -735,11 +736,19 @@ if __name__ == "__main__":
     # print(data_x_l2)
     # print(data[(data.layer == 0) & (data.axis == "y")])
     # mylplotlib.plot_box_center(data, axis="x")
-    for layer in range(6):
-        print(
-            np.mean(analyze.clear_outliers(data[(data.layer==layer) 
-                                        & (data.axis=="y")]["mu1"].values))
-            )
+    # for layer in range(6):
+    #     print(
+    #         np.mean(analyze.clear_outliers(data[(data.layer==layer) 
+    #                                     & (data.axis=="y")]["mu1"].values))
+    #         )
+    # x = np.linspace(-1, 1, 100)
+    # y = np.linspace(-1, 1, 100)
+    # X, Y = np.meshgrid(x, y)
+    # data = pd.DataFrame({"x": X.flatten(), "y": Y.flatten()})
+    # data = data[data.x**2 + data.y**2 < 0.5]
+    # print(X.flatten())
+    # plt.hist2d(data["x"].values, data["y"].values, bins=[x, y])
+    # plt.savefig("./xxx.png")
     # mylplotlib.plot_center_zscore(data, axis="y")
     # mylplotlib.plot_6hist_center_line(data_hits, axis="x")
         # print("{}".format(lim))
@@ -833,8 +842,24 @@ if __name__ == "__main__":
                     # plt.plot(range(256 - 80, 256 + 80, 2), analyze.Gauss(np.linspace(256 - 80, 256 + 80,
                     #                                                                 len(range(256 - 80, 256 + 80, 2))), *params))
                     # plt.savefig("./newdata/output/imgs/y_100_1_{}.png".format(layer))
+    
 
-
+    # pre.gen_sub_offset_data("./newdata/data_merged.csv", offsets=cfg["KCMH"]["track"]["hits"]["center"])
+    pre.gen_phys_length("./newdata/subdata_merged.csv")
+    # data = pd.read_csv("./newdata/subdata_merged.csv", index_col=None)
+    # mylplotlib.plot_6hist_center_line(data, axis="x", sub=False, cluster=True)
+    # files = [
+    #     "./newdata/float2data_70MeV1000MU.csv",
+    #     "./newdata/float2data_100MeV1000MU.csv",
+    #     "./newdata/float2data_120MeV1000MU.csv",
+    #     "./newdata/float2data_150MeV1000MU.csv",
+    #     "./newdata/float2data_180MeV1000MU.csv",
+    #     "./newdata/float2data_200MeV1000MU.csv",
+    # ]
+    # for f in files:
+    #     pre.astype_float2(f, columns=["cposX", "cposY"])
+    # pre.merge_data("./newdata/data_merged.csv", cfg["KCMH"]["track"]["hits"]["center"])
+    # pre.merge_data(files)
     #-------------- reconstrution with subtracted ----------------------#
     # sub_data = pd.read_csv("./data/experiment/data-col/datasub_70MeV1000MU.csv", 
     #                                                  index_col=None)

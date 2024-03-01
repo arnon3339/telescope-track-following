@@ -1988,7 +1988,13 @@ def plot_center_zscore(data, axis="x"):
                 dpi=300, bbox_inches='tight')
     # print(z_scores)
 
-def plot_6hist_center_line(data, axis="x", sub=False):
+def plot_6hist_center_line(data, axis="x", sub=False, cluster=False):
+    data_label = "{}pos{}{}".format(
+        "c" if cluster else "",
+        "Sub" if sub else "",
+        axis.upper() 
+    )
+    bin_width = 20 if cluster else 10
     new_data = data.copy()
     fig, axs = plt.subplots(3, 2, figsize=(18, 20))
     layers = np.unique(new_data["layerID"].values)
@@ -1998,11 +2004,11 @@ def plot_6hist_center_line(data, axis="x", sub=False):
         if layer == 4:
             layer_cut  = 2
         data_plot = new_data[(new_data.layerID==layer) & (new_data.clusterSize > layer_cut)]\
-            ["{}{}".format("posSub" if sub else "pos", axis.upper())].values
-        axs[int(layer/2), layer%2].hist(data_plot, bins=range(0, 1024, 10)\
+            ["{}".format(data_label)].values
+        axs[int(layer/2), layer%2].hist(data_plot, bins=range(0, 1024, bin_width)\
                                                                   if axis == "x" else\
                                                                      range(
-                                                                        0, 512, 10
+                                                                        0, 512, bin_width 
                                                                      ) 
                                         , label="{}".format(layer), histtype='step')
         leg = axs[int(layer/2), layer%2].legend(prop={'fname': FNAME, 'size': FONT_SIZE})
@@ -2020,7 +2026,10 @@ def plot_6hist_center_line(data, axis="x", sub=False):
             axs[int(layer/2), layer%2].yaxis.set_tick_params(which='major', width=1.5, length=10, direction="out")
             axs[int(layer/2), layer%2].yaxis.set_tick_params(which='minor', width=1, length=5, direction="out")
             axs[int(layer/2), layer%2].xaxis.set_tick_params(which='major', width=1.5, length=10, direction="out")
-    plt.suptitle("beam distribution in {} axis".format(axis), fontproperties=TIMES_BOLD,
+    plt.suptitle("{}beam{} distribution in {} axis"\
+        .format("cluster " if cluster else "", " center" if sub else "", axis),
+                 fontproperties=TIMES_BOLD,
                  fontsize=FONT_SIZE)
-    plt.savefig("./newdata/output/imgs/hist6{}_{}.png".format("_sub" if sub else "", axis), 
+    plt.savefig("./newdata/output/imgs/hist6_{}{}{}.png"\
+        .format("center_" if sub else "", "cluster_" if cluster else "", axis), 
                 dpi=300, bbox_inches='tight')

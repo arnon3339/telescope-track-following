@@ -15,3 +15,5 @@ imgs/
 .ipynb_checkpoints/
 
 refs/
+
+newdata/subphys_subdata_merged.csv
