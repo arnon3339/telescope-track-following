@@ -15,7 +15,7 @@ from modules import cluster
 from matplotlib.patches import Ellipse
 from modules import utils
 import matplotlib.mlab as mlab
-from scipy.stats import norm, multivariate_normal
+from scipy.stats import norm, multivariate_normal, zscore
 from matplotlib.ticker import (MultipleLocator,
                                FormatStrFormatter,
                                AutoMinorLocator)
@@ -1927,11 +1927,100 @@ def plot_hit_events(file_path):
 
 def plot_box_center(data: pd.DataFrame, kind="mu1", axis="x"):
     data = data[data.axis == axis]
-    if kind == "y" and axis == "y":
-        data = data[data.index != 108]
     fig, ax = plt.subplots(figsize=(10, 8))
     layers = np.unique(data["layer"].values)
     layers.sort()
     ax.boxplot([data[data.layer == layer]["{}".format(kind)].values for layer in layers])
     ax.set_title("{} axis".format(axis.upper()))
     plt.show()
+
+def plot_box_center(data: pd.DataFrame, kind="mu1", axis="x"):
+    data = data[data.axis == axis]
+    fig, ax = plt.subplots(figsize=(14, 8))
+    layers = np.unique(data["layer"].values)
+    layers.sort()
+    ax.boxplot([data[data.layer == layer]["{}".format(kind)].values for layer in layers])
+    ax.set_title("{} axis".format(axis.upper()))
+    ax.set_ylabel("$\mu$", fontproperties=TIMES_BOLD, fontsize=FONT_SIZE)
+    ax.set_xlabel("ALPIDE layer", fontproperties=TIMES_BOLD, fontsize=FONT_SIZE)
+    ax.set_title("$\mu$ distribution in {} axis".format(axis), fontproperties=TIMES_BOLD,
+                 fontsize=FONT_SIZE)
+    ax.yaxis.set_minor_locator(AutoMinorLocator())
+    ax.yaxis.set_tick_params(which='major', width=1.5, length=18, direction="out")
+    ax.yaxis.set_tick_params(which='minor', width=1, length=8, direction="out")
+    ax.xaxis.set_tick_params(which='major', width=1.5, length=18, direction="out")
+    for x in ax.xaxis.get_major_ticks():
+        x.label.set_fontproperties(TIMES_BOLD)
+        x.label.set_fontsize(FONT_SIZE)
+    for y in ax.yaxis.get_major_ticks():
+        y.label.set_fontproperties(TIMES_BOLD)
+        y.label.set_fontsize(FONT_SIZE)
+    plt.savefig("./newdata/output/imgs/centerboxes.png", 
+                dpi=300, bbox_inches='tight')
+
+def plot_center_zscore(data, axis="x"):
+    new_data = data.copy()
+    new_data = new_data[new_data.axis == axis]
+    fig, axs = plt.subplots(3, 2, figsize=(18, 20))
+    layers = np.unique(new_data["layer"].values)
+    layers.sort()
+    for layer_i, layer in enumerate(layers):
+        z_scores = np.abs(zscore(new_data[new_data.layer==layer]["mu1"].values))
+        if layer == 0:
+            # print(new_data[new_data.layer==layer]["mu1"])
+            print(z_scores)
+        axs[int(layer/2), layer%2].bar(range(len(z_scores)), z_scores, label="{}".format(layer))
+        axs[int(layer/2), layer%2].axhline(y=2, color='r', linestyle='--')
+        leg = axs[int(layer/2), layer%2].legend(prop={'fname': FNAME, 'size': FONT_SIZE})
+        for x in axs[int(layer/2), layer%2].xaxis.get_major_ticks():
+            x.label.set_fontproperties(TIMES_BOLD)
+            x.label.set_fontsize(FONT_SIZE)
+        for y in axs[int(layer/2), layer%2].yaxis.get_major_ticks():
+            y.label.set_fontproperties(TIMES_BOLD)
+            y.label.set_fontsize(FONT_SIZE)
+            axs[int(layer/2), layer%2].yaxis.set_minor_locator(AutoMinorLocator())
+            axs[int(layer/2), layer%2].yaxis.set_tick_params(which='major', width=1.5, length=10, direction="out")
+            axs[int(layer/2), layer%2].yaxis.set_tick_params(which='minor', width=1, length=5, direction="out")
+            axs[int(layer/2), layer%2].xaxis.set_tick_params(which='major', width=1.5, length=10, direction="out")
+    plt.suptitle("z-score distribution in {} axis".format(axis), fontproperties=TIMES_BOLD,
+                 fontsize=FONT_SIZE)
+    plt.savefig("./newdata/output/imgs/center_zscores_bars_{}.png".format(axis), 
+                dpi=300, bbox_inches='tight')
+    # print(z_scores)
+
+def plot_6hist_center_line(data, axis="x", sub=False):
+    new_data = data.copy()
+    fig, axs = plt.subplots(3, 2, figsize=(18, 20))
+    layers = np.unique(new_data["layerID"].values)
+    layers.sort()
+    for layer_i, layer in enumerate(layers):
+        layer_cut = 1
+        if layer == 4:
+            layer_cut  = 2
+        data_plot = new_data[(new_data.layerID==layer) & (new_data.clusterSize > layer_cut)]\
+            ["{}{}".format("posSub" if sub else "pos", axis.upper())].values
+        axs[int(layer/2), layer%2].hist(data_plot, bins=range(512 - 200, 512 + 200, 10)\
+                                                                  if axis == "x" else\
+                                                                     range(
+                                                                        256 - 100, 256 + 100, 10
+                                                                     ) 
+                                        , label="{}".format(layer), histtype='step')
+        leg = axs[int(layer/2), layer%2].legend(prop={'fname': FNAME, 'size': FONT_SIZE})
+        if axis == "x":
+            axs[int(layer/2), layer%2].axvline(x=512, color='r', linestyle='--')
+        else:
+            axs[int(layer/2), layer%2].axvline(x=256, color='r', linestyle='--')
+        for x in axs[int(layer/2), layer%2].xaxis.get_major_ticks():
+            x.label.set_fontproperties(TIMES_BOLD)
+            x.label.set_fontsize(FONT_SIZE)
+        for y in axs[int(layer/2), layer%2].yaxis.get_major_ticks():
+            y.label.set_fontproperties(TIMES_BOLD)
+            y.label.set_fontsize(FONT_SIZE)
+            axs[int(layer/2), layer%2].yaxis.set_minor_locator(AutoMinorLocator())
+            axs[int(layer/2), layer%2].yaxis.set_tick_params(which='major', width=1.5, length=10, direction="out")
+            axs[int(layer/2), layer%2].yaxis.set_tick_params(which='minor', width=1, length=5, direction="out")
+            axs[int(layer/2), layer%2].xaxis.set_tick_params(which='major', width=1.5, length=10, direction="out")
+    plt.suptitle("beam distribution in {} axis".format(axis), fontproperties=TIMES_BOLD,
+                 fontsize=FONT_SIZE)
+    plt.savefig("./newdata/output/imgs/hist6{}_{}.png".format("_sub" if sub else "", axis), 
+                dpi=300, bbox_inches='tight')

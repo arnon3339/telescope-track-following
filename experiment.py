@@ -717,19 +717,22 @@ if __name__ == "__main__":
     # pd_data["amp2"] = pd_data["amp2"].astype("float64")
     # pd_data.to_csv("./beamfit_section.csv", index=False)
     data = pd.read_csv("./beamfit_section.csv", index_col=None)
-    data_x_l0 = utils.select_center_fit(data, axis="x", layer=0,
-                                        nosigs=[1.54])
-    data_y_l0 = utils.select_center_fit(data, axis="y", layer=0,
-                                        nosigs=[-5.41, 2.55, 0.08, 24.76])
-    data_x_l1 = utils.select_center_fit(data, axis="x", layer=1,
-                                        nosigs=[])
-    data_y_l1 = utils.select_center_fit(data, axis="y", layer=1,
-                                        nosigs=[])
-    data_x_l2 = utils.select_center_fit(data, axis="x", layer=2,
-                                        nosigs=[])
-    print(data_x_l2)
+    data_hit = pd.read_csv("./newdata/datasub_70MeV1000MU.csv", index_col=None)
+    # data_x_l0 = utils.select_center_fit(data, axis="x", layer=0,
+    #                                     nosigs=[1.54])
+    # data_y_l0 = utils.select_center_fit(data, axis="y", layer=0,
+    #                                     nosigs=[-5.41, 2.55, 0.08, 24.76])
+    # data_x_l1 = utils.select_center_fit(data, axis="x", layer=1,
+    #                                     nosigs=[])
+    # data_y_l1 = utils.select_center_fit(data, axis="y", layer=1,
+    #                                     nosigs=[])
+    # data_x_l2 = utils.select_center_fit(data, axis="x", layer=2,
+    #                                     nosigs=[])
+    # print(data_x_l2)
     # print(data[(data.layer == 0) & (data.axis == "y")])
-    # mylplotlib.plot_box_center(data, kind="sigma1", axis="y")
+    # mylplotlib.plot_box_center(data, axis="y")
+    mylplotlib.plot_center_zscore(data, axis="y")
+    # mylplotlib.plot_6hist_center_line(data_hit, axis="y")
         # print("{}".format(lim))
         # analyze.get_est_hit_data(
         #     data_layer,
