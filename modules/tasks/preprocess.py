@@ -63,4 +63,4 @@ def astype_float2(f:str, columns=[]):
     data = pd.read_csv(f, index_col=None)
     for column in columns:
         data[column] = data[column].apply(lambda x: "{:.2f}".format(x)).astype('float')
-    data.to_csv(path.join(dirname, "float2{}".format(fname)), index=None)
+    data.to_csv(path.join(dirname, "{}".format(fname)), index=None)

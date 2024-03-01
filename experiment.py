@@ -845,19 +845,19 @@ if __name__ == "__main__":
     
 
     # pre.gen_sub_offset_data("./newdata/data_merged.csv", offsets=cfg["KCMH"]["track"]["hits"]["center"])
-    pre.gen_phys_length("./newdata/subdata_merged.csv")
+    # pre.gen_phys_length("./newdata/subdata_merged.csv")
     # data = pd.read_csv("./newdata/subdata_merged.csv", index_col=None)
     # mylplotlib.plot_6hist_center_line(data, axis="x", sub=False, cluster=True)
-    # files = [
-    #     "./newdata/float2data_70MeV1000MU.csv",
-    #     "./newdata/float2data_100MeV1000MU.csv",
-    #     "./newdata/float2data_120MeV1000MU.csv",
-    #     "./newdata/float2data_150MeV1000MU.csv",
-    #     "./newdata/float2data_180MeV1000MU.csv",
-    #     "./newdata/float2data_200MeV1000MU.csv",
-    # ]
-    # for f in files:
-    #     pre.astype_float2(f, columns=["cposX", "cposY"])
+    files = [
+        "./newdata/data_70MeV1000MU.csv",
+        "./newdata/data_100MeV1000MU.csv",
+        "./newdata/data_120MeV1000MU.csv",
+        "./newdata/data_150MeV1000MU.csv",
+        "./newdata/data_180MeV1000MU.csv",
+        "./newdata/data_200MeV1000MU.csv",
+    ]
+    for f in files:
+        pre.astype_float2(f, columns=["cposX", "cposY"])
     # pre.merge_data("./newdata/data_merged.csv", cfg["KCMH"]["track"]["hits"]["center"])
     # pre.merge_data(files)
     #-------------- reconstrution with subtracted ----------------------#
