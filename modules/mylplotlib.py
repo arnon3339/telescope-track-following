@@ -1,4 +1,6 @@
 from ast import literal_eval
+import os
+from os import path
 from itertools import combinations
 import matplotlib
 matplotlib.rcParams['axes.unicode_minus'] = False
@@ -1907,3 +1909,29 @@ def plot_alpide_grid_track(track_data: pd.DataFrame, energy):
         # ax.vlines(np.arange(-x_sigma3, x_sigma3), -y_sigma3, y_sigma3, 'k', linestyles='--', linewidth=0.5)
         # ax.hlines(np.arange(-y_sigma3, y_sigma3), -x_sigma3, x_sigma3, 'k', linestyles='--', linewidth=0.5)
         plt.show()
+
+def plot_hit_events(file_path):
+    files = os.listdir(file_path)
+    files.sort()
+    data = [[], []]
+    for f in files:
+        data_hit = cluster.exproot2array(path.join(file_path, f))
+        data[0].append(int(f.split('_')[1].split('.')[0]))
+        data[1].append(len((np.where(np.array(data_hit) > 0.0))[0]))
+    #     event_id = int(f.split('_')[1].split('.')[0])
+    fig, ax = plt.subplots(figsize=(10, 8))
+    ax.plot(*data)
+    ax.set_xlabel("Event number")
+    ax.set_ylabel("Entries")
+    plt.show()
+
+def plot_box_center(data: pd.DataFrame, kind="mu1", axis="x"):
+    data = data[data.axis == axis]
+    if kind == "y" and axis == "y":
+        data = data[data.index != 108]
+    fig, ax = plt.subplots(figsize=(10, 8))
+    layers = np.unique(data["layer"].values)
+    layers.sort()
+    ax.boxplot([data[data.layer == layer]["{}".format(kind)].values for layer in layers])
+    ax.set_title("{} axis".format(axis.upper()))
+    plt.show()

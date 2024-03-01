@@ -656,57 +656,92 @@ if __name__ == "__main__":
     #     )
     
     #--------------- Fitting sub Guassian ----------------#
-    # layer = 5
-    axis = "y"
-    energy = 100 
-    hit_data_sub = pd.read_csv("./data/experiment/data-col/datasub_{}MeV1000MU.csv".format(energy),
-                               index_col=None)
-    fig, axs = plt.subplots(2, 3, figsize=(12, 8))
-    for layer in range(6):
-        data_layer = []
-        lim = []
-        params = []
-        if axis == "x":
-            # lim = [0, 1024]
-            lim = cfg["experiment"]["{} MeV".format(energy)]["range"]["xsub"][layer]
-            data_layer = hit_data_sub[(hit_data_sub.layerID == layer) &
-                                    (hit_data_sub.clusterSize > 1) &
-                                    (hit_data_sub.posSubX <= lim[1]) &
-                                    (hit_data_sub.posSubX >= lim[0])]["posSubX"].values \
-                                        if layer != 4 else hit_data_sub[(hit_data_sub.layerID == layer) &
-                                    (hit_data_sub.clusterSize > 2) &
-                                    (hit_data_sub.posSubX <= lim[1]) &
-                                    (hit_data_sub.posSubX >= lim[0])]["posSubX"].values
-            # params = analyze.get_gfit2g(data_layer, expected=cfg["experiment"]["{} MeV".format(energy)]["expectedsub"]["x"][layer])
-            params = analyze.get_gfitg(data_layer, expected=cfg["experiment"]["{} MeV".format(energy)]["expectedsub"]["x"][layer])
-        else:
-            # lim = [0, 512]
-            lim = cfg["experiment"]["{} MeV".format(energy)]["range"]["ysub"][layer]
-            data_layer = hit_data_sub[(hit_data_sub.layerID == layer) &
-                                    (hit_data_sub.clusterSize > 1) &
-                                    (hit_data_sub.posSubY <= lim[1]) &
-                                    (hit_data_sub.posSubY >= lim[0])]["posSubY"].values \
-                                        if layer != 4 else hit_data_sub[(hit_data_sub.layerID == layer) &
-                                    (hit_data_sub.clusterSize > 2) &
-                                    (hit_data_sub.posSubY <= lim[1]) &
-                                    (hit_data_sub.posSubY >= lim[0])]["posSubY"].values
-            # params = analyze.get_gfit2g(data_layer, expected=cfg["experiment"]["{} MeV".format(energy)]["expectedsub"]["y"][layer])
-            params = analyze.get_gfitg(data_layer, expected=cfg["experiment"]["{} MeV".format(energy)]["expectedsub"]["y"][layer])
-        data_layer.sort()
-        print(params)
-        values, counts = np.unique(data_layer, return_counts=True)
-        axs[int(layer/3), layer%3].hist(data_layer, bins=range(lim[0], lim[1]))
-        axs[int(layer/3), layer%3].plot(values, analyze.Gauss(values, *params))
-        # axs[int(layer/3), layer%3].plot(values, analyze.Gauss_2fits(values, *params))
-        axs[int(layer/3), layer%3].set_title("{}".format(layer))
-        # axs[int(layer/3), layer%3].vlines(lim, 0, max(counts), color='r', linestyles='--')
-    plt.show()
+    # hit_data_sub = pd.read_csv("./data/experiment/data-col/data_{}MeV1000MU.csv".format(energy),
+    #                            index_col=None)
+    # pd_data_dict = {"energy": [], "axis": [], "section": [], "layer": [], "mu1": [], 
+    #                 "sigma1": [], "amp1": [], "mu2": [], "sigma2": [], "amp2": []}
+    # energies = [70, 100, 120, 150, 180, 200]
+    # for energy_i, energy in enumerate(energies):
+    #     hit_data = pd.read_csv("./data/experiment/data-col/data_{}MeV1000MU.csv".format(energy),
+    #                             index_col=None)
+    #     for axis_i, axis in enumerate(["x", "y"]):
+    #         # sections = 3 if energy != 180 else 2
+    #         sections = 2
+    #         splited_hit_data = utils.split_data(hit_data, sections)
+    #         for section in range(sections):
+    #             layers = np.unique(splited_hit_data[section]["layerID"].values)
+    #             layers.sort()
+    #             for layer_i, layer in enumerate(layers):
+    #                 params = []
+    #                 if axis == "x":
+    #                     lim = [0, 1024]
+    #                     data_layer = splited_hit_data[section][(splited_hit_data[section].layerID == layer) &
+    #                                             (splited_hit_data[section].clusterSize > 1) &
+    #                                             (splited_hit_data[section].posX <= lim[1]) &
+    #                                             (splited_hit_data[section].posX >= lim[0])]["posX"].values \
+    #                                                 if layer != 4 else splited_hit_data[section][(splited_hit_data[section].layerID == layer) &
+    #                                             (splited_hit_data[section].clusterSize > 2) &
+    #                                             (splited_hit_data[section].posX <= lim[1]) &
+    #                                             (splited_hit_data[section].posX >= lim[0])]["posX"].values
+    #                     params = analyze.get_gfit2g(data_layer, expected=cfg["experiment"]["{} MeV".format(energy)]["expectedsub"]["x"][layer])
+    #                 else:
+    #                     lim = [0, 512]
+    #                     data_layer = splited_hit_data[section][(splited_hit_data[section].layerID == layer) &
+    #                                             (splited_hit_data[section].clusterSize > 1) &
+    #                                             (splited_hit_data[section].posY <= lim[1]) &
+    #                                             (splited_hit_data[section].posY >= lim[0])]["posY"].values \
+    #                                                 if layer != 4 else splited_hit_data[section][(splited_hit_data[section].layerID == layer) &
+    #                                             (splited_hit_data[section].clusterSize > 2) &
+    #                                             (splited_hit_data[section].posY <= lim[1]) &
+    #                                             (splited_hit_data[section].posY >= lim[0])]["posY"].values
+    #                     params = analyze.get_gfit2g(data_layer, expected=cfg["experiment"]["{} MeV".format(energy)]["expectedsub"]["y"][layer])
+    #                 pd_data_dict["energy"].append(energy)
+    #                 pd_data_dict["axis"].append(axis)
+    #                 pd_data_dict["section"].append(section)
+    #                 pd_data_dict["layer"].append(layer)
+    #                 pd_data_dict["mu1"].append("{:.2f}".format(params[0]))
+    #                 pd_data_dict["sigma1"].append("{:.2f}".format(params[1]))
+    #                 pd_data_dict["amp1"].append("{:.2f}".format(params[2]))
+    #                 pd_data_dict["mu2"].append("{:.2f}".format(params[3]))
+    #                 pd_data_dict["sigma2"].append("{:.2f}".format(params[4]))
+    #                 pd_data_dict["amp2"].append("{:.2f}".format(params[5]))
+    # pd_data = pd.DataFrame(pd_data_dict)
+    # pd_data["energy"] = pd_data["energy"].astype("int")
+    # pd_data["section"] = pd_data["section"].astype("int")
+    # pd_data["layer"] = pd_data["layer"].astype("int")
+    # pd_data["mu1"] = pd_data["mu1"].astype("float64")
+    # pd_data["sigma1"] = pd_data["sigma1"].astype("float64")
+    # pd_data["amp1"] = pd_data["amp1"].astype("float64")
+    # pd_data["mu2"] = pd_data["mu2"].astype("float64")
+    # pd_data["sigma2"] = pd_data["sigma2"].astype("float64")
+    # pd_data["amp2"] = pd_data["amp2"].astype("float64")
+    # pd_data.to_csv("./beamfit_section.csv", index=False)
+    data = pd.read_csv("./beamfit_section.csv", index_col=None)
+    data_x_l0 = utils.select_center_fit(data, axis="x", layer=0,
+                                        nosigs=[1.54])
+    data_y_l0 = utils.select_center_fit(data, axis="y", layer=0,
+                                        nosigs=[-5.41, 2.55, 0.08, 24.76])
+    data_x_l1 = utils.select_center_fit(data, axis="x", layer=1,
+                                        nosigs=[])
+    data_y_l1 = utils.select_center_fit(data, axis="y", layer=1,
+                                        nosigs=[])
+    data_x_l2 = utils.select_center_fit(data, axis="x", layer=2,
+                                        nosigs=[])
+    print(data_x_l2)
+    # print(data[(data.layer == 0) & (data.axis == "y")])
+    # mylplotlib.plot_box_center(data, kind="sigma1", axis="y")
         # print("{}".format(lim))
         # analyze.get_est_hit_data(
         #     data_layer,
         #     512, lim=lim
         #     )
     # plt.show()
+    # beamfit_data = utils.read_beam_fit("./beamfitlogs.txt")
+    # print(beamfit_data)
+    # mylplotlib.plot_hit_events("./data/experiment/Col070MeV1000MU_merged")
+    # splited_data = utils.split_data(hit_data_sub, 4)
+    # print(splited_data)
+
 
     #-------------- reconstrution with subtracted ----------------------#
     # sub_data = pd.read_csv("./data/experiment/data-col/datasub_70MeV1000MU.csv", 

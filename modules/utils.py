@@ -381,3 +381,51 @@ def collect_col_chits(data):
                     cfg["experiment"][f"{e} MeV"]["sigmas"]["y"][l]))**2
                 ])
     return pd.concat(data_out_list, ignore_index=True)
+
+def read_beam_fit(file):
+    data = {"energy": [], "axis": [], "layer": [], "mu1": [], "sigma1": [],
+            "amp1": [], "mu2": [], "sigma2": [], "apm2": []}
+    with open(file, 'r') as f:
+        line = f.readline()
+        while line:
+            if '#' in line:
+                data_list1 = line.split(' ')
+                f.readline()
+                for layer in range(6):
+                    data_list2 = f.readline().split('\t')
+                    print(data_list2)
+                    data["energy"].append(data_list1[1])
+                    data["axis"].append(data_list1[3])
+                    data["layer"].append(layer)
+                    data["mu1"].append(data_list2[0])
+                    data["sigma1"].append(data_list2[1])
+                    data["amp1"].append(data_list2[2])
+                    data["mu2"].append(data_list2[3])
+                    data["sigma2"].append(data_list2[4])
+                    data["apm2"].append(data_list2[5])
+                line = f.readline()
+    pd_data = pd.DataFrame(data)
+    pd_data["energy"] = pd_data["energy"].astype("int")
+    pd_data["layer"] = pd_data["layer"].astype("int")
+    for column in pd_data.columns:
+        if column not in ["energy", "axis", "layer"]:
+            pd_data[column] = pd_data[column].astype("float64")
+    return pd_data
+
+def split_data(data: pd.DataFrame, n_part=1):
+    data_len = len(data.index)
+    d_data = int(data_len/n_part)
+    new_data = []
+    for i in range(n_part):
+        if i != n_part -1:
+            new_data.append(data.iloc[int(i*d_data): int((i + 1)*d_data), :])
+        else:
+            new_data.append(data.iloc[int(i*d_data):, :])
+    return new_data
+
+def select_center_fit(data: pd.DataFrame, axis="x", layer=0, 
+                      nosigs=[]):
+    new_data = data.copy()
+    new_data = data[(data.axis==axis) & (data.layer==layer)]
+    new_data = new_data[(~new_data.sigma1.isin(nosigs))]
+    return new_data
