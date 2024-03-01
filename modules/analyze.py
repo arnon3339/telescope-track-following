@@ -272,3 +272,11 @@ def find_correlation(data):
                                 data_dict["y"].append(data_y[data_y.MyTrackID == tid]["posY"].values[0])
                     print(f"Finished energy: {e}, mcs: {mcs}, eventID: {evt}")
     return data_dict
+
+def clear_outliers(data):
+    q3 = np.percentile(data, 75)
+    q1 = np.percentile(data, 25)
+
+    iqr = q3 - q1
+    threshold = 1.5
+    return data[np.where((data < q3 + iqr*threshold) & (data > q1 - iqr*threshold))[0]]

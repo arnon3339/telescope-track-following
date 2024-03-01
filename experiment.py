@@ -717,7 +717,11 @@ if __name__ == "__main__":
     # pd_data["amp2"] = pd_data["amp2"].astype("float64")
     # pd_data.to_csv("./beamfit_section.csv", index=False)
     data = pd.read_csv("./beamfit_section.csv", index_col=None)
-    data_hit = pd.read_csv("./newdata/datasub_70MeV1000MU.csv", index_col=None)
+    # data_hits = [
+    #     pd.read_csv("./newdata/data_{}MeV1000MU.csv".format(i), index_col=None)\
+    #         for i in [70, 100, 120, 150, 180, 200]
+    #              ]
+    # data_hits = pd.concat(data_hits, ignore_index=True)
     # data_x_l0 = utils.select_center_fit(data, axis="x", layer=0,
     #                                     nosigs=[1.54])
     # data_y_l0 = utils.select_center_fit(data, axis="y", layer=0,
@@ -730,9 +734,14 @@ if __name__ == "__main__":
     #                                     nosigs=[])
     # print(data_x_l2)
     # print(data[(data.layer == 0) & (data.axis == "y")])
-    # mylplotlib.plot_box_center(data, axis="y")
-    mylplotlib.plot_center_zscore(data, axis="y")
-    # mylplotlib.plot_6hist_center_line(data_hit, axis="y")
+    # mylplotlib.plot_box_center(data, axis="x")
+    for layer in range(6):
+        print(
+            np.mean(analyze.clear_outliers(data[(data.layer==layer) 
+                                        & (data.axis=="y")]["mu1"].values))
+            )
+    # mylplotlib.plot_center_zscore(data, axis="y")
+    # mylplotlib.plot_6hist_center_line(data_hits, axis="x")
         # print("{}".format(lim))
         # analyze.get_est_hit_data(
         #     data_layer,
@@ -744,6 +753,86 @@ if __name__ == "__main__":
     # mylplotlib.plot_hit_events("./data/experiment/Col070MeV1000MU_merged")
     # splited_data = utils.split_data(hit_data_sub, 4)
     # print(splited_data)
+
+    # data_beam_fit = pd.read_csv("./beamfit_section.csv", index_col=None)
+    # data_beam_fit_wo_70_100 = data_beam_fit[~data_beam_fit.energy.isin([70, 100])]
+    # data_70 = pd.read_csv("./newdata/data_70MeV1000MU.csv", index_col=None)
+    # data_100 = pd.read_csv("./newdata/data_100MeV1000MU.csv", index_col=None)
+    # data_70 = data_70[
+    #     (data_70.posX > 512 - 80) & (data_70.posX < 512 + 80) &
+    #     (data_70.posY > 256 - 80) & (data_70.posY < 256 + 80)
+    #     ]
+    # data_100 = data_100[
+    #     (data_100.posX > 512 - 80) & (data_100.posX < 512 + 80) &
+    #     (data_100.posY > 256 - 80) & (data_100.posY < 256 + 80)
+    #     ]
+    # data_70_0 = data_70.iloc[0: int(len(data_70.index)/2), :]
+    # data_70_1 = data_70.iloc[int(len(data_70.index)/2):, :]
+    # data_100_0 = data_100.iloc[0: int(len(data_100.index)/2), :]
+    # data_100_1 = data_100.iloc[int(len(data_100.index)/2):, :]
+
+    # expected_x = [512, 20, 200]
+    # expected_y = [256, 20, 200]
+
+    # data = {
+    #     70: {
+    #         "data": [data_70_0, data_70_1],
+    #         "expected": {
+    #             "x": expected_x,
+    #             "y" : expected_y
+    #         }
+    #     },
+    #     100: {
+    #         "data": [data_100_0, data_100_1],
+    #         "expected": {
+    #             "x": expected_x,
+    #             "y" : expected_y
+    #         }
+    #     }
+    # }
+    # data_dict_w_70_100 = {k: [] for k in data_beam_fit.columns}
+    # for energy in [70, 100]:
+    #     for axis in ["x", "y"]:
+    #         for section in range(2):
+    #             for layer in range(6):
+    #                 data_ana = data[energy]["data"][section]
+    #                 data_ana = data_ana[data_ana.layerID == layer]
+    #                 if layer == 4:
+    #                     data_ana = data_ana[data_ana.clusterSize > 2]
+    #                 else:
+    #                     data_ana = data_ana[data_ana.clusterSize > 1]
+    #                 params = analyze.get_gfitg(data_ana["pos{}".format(axis.upper())]\
+    #                     .values, data[energy]["expected"][axis])
+
+    #                 data_dict_w_70_100["energy"].append(energy)
+    #                 data_dict_w_70_100["axis"].append(axis)
+    #                 data_dict_w_70_100["section"].append(section)
+    #                 data_dict_w_70_100["layer"].append(layer)
+    #                 data_dict_w_70_100["mu1"].append("{:.2f}".format(params[0]))
+    #                 data_dict_w_70_100["sigma1"].append("{:.2f}".format(params[1]))
+    #                 data_dict_w_70_100["amp1"].append("{:.2f}".format(params[2]))
+    #                 data_dict_w_70_100["mu2"].append("{:.2f}".format(params[0]))
+    #                 data_dict_w_70_100["sigma2"].append("{:.2f}".format(0))
+    #                 data_dict_w_70_100["amp2"].append("{:.2f}".format(0))
+    
+    # pd_data_dict_w_70_100 = pd.DataFrame(data_dict_w_70_100)
+    # pd_data_dict_w_70_100["energy"] = pd_data_dict_w_70_100["energy"].astype("int")
+    # pd_data_dict_w_70_100["section"] = pd_data_dict_w_70_100["section"].astype("int")
+    # pd_data_dict_w_70_100["layer"] = pd_data_dict_w_70_100["layer"].astype("int")
+    # pd_data_dict_w_70_100["mu1"] = pd_data_dict_w_70_100["mu1"].astype("float64")
+    # pd_data_dict_w_70_100["sigma1"] = pd_data_dict_w_70_100["sigma1"].astype("float64")
+    # pd_data_dict_w_70_100["amp1"] = pd_data_dict_w_70_100["amp1"].astype("float64")
+    # pd_data_dict_w_70_100["mu2"] = pd_data_dict_w_70_100["mu2"].astype("float64")
+    # pd_data_dict_w_70_100["sigma2"] = pd_data_dict_w_70_100["sigma2"].astype("float64")
+    # pd_data_dict_w_70_100["amp2"] = pd_data_dict_w_70_100["amp2"].astype("float64")
+    # pd.concat([pd_data_dict_w_70_100, data_beam_fit_wo_70_100], ignore_index=True).\
+    #     to_csv("new_beam_fit.csv", index=None)
+                    # print(params)
+                    # fig, ax = plt.subplots(figsize=(10, 8))
+                    # plt.hist(data_plot["posY"].values, bins=range(256 - 80, 256 + 80, 2))
+                    # plt.plot(range(256 - 80, 256 + 80, 2), analyze.Gauss(np.linspace(256 - 80, 256 + 80,
+                    #                                                                 len(range(256 - 80, 256 + 80, 2))), *params))
+                    # plt.savefig("./newdata/output/imgs/y_100_1_{}.png".format(layer))
 
 
     #-------------- reconstrution with subtracted ----------------------#
